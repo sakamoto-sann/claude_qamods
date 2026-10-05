@@ -1,0 +1,7 @@
+{
+  "name": "qa-guide-codex",
+  "version": "0.4.0",
+  "description": "質問の背景、選択後の結果、おすすめをCodexチャット内で示すskills-only版。",
+  "license": "MIT",
+  "skills": "./skills/"
+}

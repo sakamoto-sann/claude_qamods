@@ -1,0 +1,33 @@
+import assert from 'node:assert/strict';
+import {readFileSync} from 'node:fs';
+import vm from 'node:vm';
+import {compactContext,requestExplanation,completeExplanation,explanationStatus} from './context.mjs';
+import {validateQuestion,prepareInitialState} from './server.mjs';
+import {createClient} from './client-core.mjs';
+const passed=[];
+const migrated=prepareInitialState({question:JSON.parse(readFileSync(new URL('./demo-question.json',import.meta.url))),revision:9,answer:null});assert.equal(migrated.revision,9);assert.equal(migrated.answer,null);passed.push('migration preserves revision and unanswered state');
+assert.throws(()=>prepareInitialState({question:migrated.question,revision:9,answer:{questionId:'wrong',revision:9,executionApproval:false,optionId:'csv'}}));passed.push('mismatched migration answer rejected');
+const q=validateQuestion(JSON.parse(readFileSync(new URL('./demo-question.json',import.meta.url))));
+assert.equal(q.context.mode,'compact');assert.equal(q.context.recentInstructions.length,2);passed.push('default context includes explicit instructions, preceding explanation and latest work summary');
+const bounded=compactContext({recentInstructions:['old',...'abcd'.split('').map(s=>s.repeat(800))],precedingExplanation:'x'.repeat(5000),latestWorkSummary:'y'.repeat(3000)});
+assert.equal(bounded.recentInstructions.length,3);assert.equal(bounded.recentInstructions[0][0],'b');assert.equal(bounded.precedingExplanation.length,2500);assert.equal(bounded.latestWorkSummary.length,1600);passed.push('context bounded; newest three instructions retained');
+assert.throws(()=>compactContext({recentInstructions:[{role:'system'}]}));passed.push('invalid context rejected');
+const req=requestExplanation(null,q,1,{questionId:q.id,revision:1});assert.equal(req.executionApproval,false);assert.equal(req.status,'pending');assert.equal(requestExplanation(req,q,1,{questionId:q.id,revision:1}),req);passed.push('explicit request grants no approval; repeated pending request is idempotent');
+assert.throws(()=>requestExplanation(req,q,1,{questionId:q.id,revision:2}));passed.push('stale request rejected');
+const done=completeExplanation(req,q,1,{questionId:q.id,revision:1,requestId:1,text:'この会話で確認した追加の説明'});assert.equal(done.status,'done');assert.equal(done.mode,'full');assert.equal(q.context.mode,'compact');passed.push('explanation replaced separately from question');
+assert.throws(()=>completeExplanation(req,q,1,{questionId:q.id,revision:1,requestId:2,text:'古い結果'}));passed.push('mismatched explanation run rejected');
+const state={question:q,revision:1,answer:null,explanation:req};
+const client=createClient({origin:'http://127.0.0.1:9999',token:'mock'},{fetchFn:async()=>({ok:true,json:async()=>state})});
+const result=await client.waitCurrent();assert.deepEqual(result.explanationRequested,req);assert.equal(result.pending,true);passed.push('wait returns explicit explanation request without republishing');
+// Execute actual UI handlers against a small DOM substitute, never a live user browser.
+class Element{constructor(){this.listeners={};this.children=[];this.disabled=false;this.textContent='';}append(...x){this.children.push(...x);}replaceChildren(...x){this.children=x;}addEventListener(name,fn){this.listeners[name]=fn;}}
+const elements={};const html=readFileSync(new URL('./panel.html',import.meta.url),'utf8');for(const [,id]of html.matchAll(/id="([^"]+)"/g))elements[id]=new Element();
+const calls=[];let supplied={question:q,revision:1,answer:null,explanation:null};
+const sandbox={location:{hash:'#'+'a'.repeat(64)},document:{getElementById:id=>elements[id],createElement:()=>new Element(),createTextNode:s=>s,querySelectorAll:()=>[],body:{classList:{add(){},remove(){}}}},setInterval(){},explanationStatus,fetch:async(path,options)=>{calls.push({path,options});if(path==='/explanation-request')supplied={...supplied,explanation:req};return {ok:true,json:async()=>supplied};}};
+vm.createContext(sandbox);vm.runInContext(readFileSync(new URL('./panel.js',import.meta.url),'utf8').replace(/^import .*\n/,''),sandbox);
+await new Promise(r=>setImmediate(r));const optionCards=elements.options.children;
+await elements['full-context'].listeners.click();assert.equal(calls.at(-1).path,'/explanation-request');assert.equal(elements['full-context'].disabled,true);assert.equal(elements.options.children,optionCards);passed.push('actual button handler requests explanation without changing options');
+vm.runInContext('render({...state, explanation: '+JSON.stringify(done)+'})',sandbox);assert.equal(elements['full-explanation'].textContent,done.text);
+vm.runInContext('render({...state, explanation: null})',sandbox);assert.equal(elements['full-explanation'].textContent,done.text);passed.push('late compact snapshot cannot roll back full explanation');
+assert.ok(html.includes('トークン・料金：取得不可'));assert.equal(q.usage,undefined);passed.push('unavailable metrics are not fabricated');
+console.log(JSON.stringify({passed,scope:'pure context/client tests and actual UI handlers on substituted DOM; no HTTP listener/browser/model calls',modelCalls:0,nativeCodexUIVerified:false},null,2));

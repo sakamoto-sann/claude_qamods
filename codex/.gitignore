@@ -1,0 +1,6 @@
+*.session.json
+*.session.json.*
+session.json
+sessions/
+backups/
+evidence/
