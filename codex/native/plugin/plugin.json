@@ -1,7 +1,7 @@
 {
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "qa-guide-codex",
-  "version": "0.5.2",
+  "version": "0.5.3",
   "description": "会話の質問の背景・選択後の結果・おすすめを示すローカルQA拡張。",
   "author": {
     "name": "sakamoto-sann"

@@ -1,4 +1,4 @@
-# Native QA Guide 0.5.2
+# Native QA Guide 0.5.3
 
 Node.js 22以降とMCP Apps対応ホスト向けのstdioプラグインです。ソースからビルドすると、`plugin/dist/server.mjs`と自己完結したパネルHTMLを生成します。実行時にnpmは不要です。
 

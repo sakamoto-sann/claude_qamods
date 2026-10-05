@@ -1,4 +1,4 @@
-# Private Sites QA Guide 0.5.2
+# Private Sites QA Guide 0.5.3
 
 本人専用のSites MCP App向けWorkerです。`POST /mcp`でqa.open、qa.explainと会話用UIを提供します。Node用stdioサーバーをクラウドから起動する構成ではありません。
 
@@ -21,6 +21,8 @@ MCP capabilityを保持して、公式ソース同期・保存・私有公開を
 このWorkerはSites Dispatchの本人専用アクセスと注入されたユーザー識別を前提とします。識別ヘッダーの存在だけを独立した認証として扱う公開ホストへ移さないでください。データを含む呼び出しはユーザー識別がなければ401です。サービス用認証はユーザー識別の代用になりません。独自OAuth・APIキー・トンネルを追加しません。
 
 D1/R2や外部AI APIは使いません。明示的な質問・背景・選択肢・文脈・再説明のみを処理し、要求ごとにServer/Transportを閉じます。回答はUIからホストへ送ります。ファイルや会話履歴は自動で読みません。アプリに永続保存がないことは、Sites/ChatGPTの通常の通信・会話記録が一切残らないという意味ではありません。
+
+The UI resource URI is `ui://qa-guide/question-panel/v0.5.3.html`. Both UI tools refer to this versioned cache key. Publish a new URI for a breaking HTML, JavaScript or CSS change; updating server version alone does not change that key. See the official [UI resource cache-key guidance](https://developers.openai.com/plugins/build/chatgpt-ui).
 
 ## Verification
 

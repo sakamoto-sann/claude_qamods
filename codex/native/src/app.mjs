@@ -1,7 +1,7 @@
 import {App,applyDocumentTheme,applyHostStyleVariables} from '@modelcontextprotocol/ext-apps';
 import {OpenAIExtensions} from '@openai/mcp-extensions/app';
 import {acceptResult,sendAnswer,requestFull,fullStatus,answerEditable,answerStatus} from './view-state.mjs';
-const app=new App({name:'qa-guide-codex',version:'0.5.2'},{availableDisplayModes:['inline','fullscreen']},{autoResize:true});
+const app=new App({name:'qa-guide-codex',version:'0.5.3'},{availableDisplayModes:['inline','fullscreen']},{autoResize:true});
 const extensions=new OpenAIExtensions(app);
 let state={question:null,revision:0,selected:null,answer:null,delivery:'idle'},busy=false;
 const $=id=>document.getElementById(id);
