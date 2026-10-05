@@ -1,0 +1,8 @@
+{
+  "name": "qa-guide-codex",
+  "version": "0.5.2",
+  "description": "会話の質問の背景・選択後の結果・おすすめを示すローカルQA拡張。",
+  "license": "MIT",
+  "skills": "./skills/",
+  "mcpServers": "./mcp.json"
+}

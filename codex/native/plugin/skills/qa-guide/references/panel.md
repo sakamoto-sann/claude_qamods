@@ -1,0 +1,15 @@
+# MCP会話パネル版
+
+このプラグインが接続済みで、qa.open/qa.explainが利用できる場合だけ使う。未提供のAPIを呼んだと主張しない。
+
+1. qa.openを空引数で呼ぶと空のQAビューを表示する。本人の判断が必要な質問があるときだけ、questionと正のrevisionを明示する。questionのid/question/background/goal/taskId/taskName/currentState/decision/completionCriteria/options/recommendation、constraints/uncertainties、contextのrecentInstructions/precedingExplanation/latestWorkSummaryをこの会話の確かな情報から用意する。履歴DBや別スレッドを読み取らない。
+2. 初回はrevision 1、その会話で質問を更新するときだけ増やす。全選択肢を保持する。更新しない質問を同じrevisionで再送しても、本人の選択・回答を初期化しない。
+3. 本人がパネルで確定するとqa-answerの引用データが現在の会話へ届く。対象タスクID・質問ID・revisionが現在の質問と一致する場合だけ、選択と結果を短く確認し、許可済みの作業を続ける。古い回答・推薦・試験選択を本人の同意に変えない。executionApproval:falseを維持する。
+4. 全文脈の再説明を本人が明示した場合、依頼メッセージのrequestIdを変更せず、qa.explain({questionId,revision,requestId,text})でこの会話で参照できた範囲から再説明を返す。質問や選択を更新しない。全文脈が見えない場合は範囲を明示する。追加モデルAPIや会話全文の別サービス送信はしない。
+5. ui/messageが未対応のホストでは本人の回答はチャットで受け取る。表示要求・MCPのJSON結果・プロトコル試験だけで実画面の成功を説明しない。
+
+状態は各会話のUI instanceのメモリだけに保持し、サーバーは全会話共有の質問・回答状態を持たない。このMCP版の表示と送信はホスト対応に依存する。モデル側は前提を満たす質問だけを送り、ラベルだけから仕様を作らない。
+
+対象タスクの表示名とID、現在状態、決める事項、完了条件は省略しない。taskReferenceは必要な場合だけ指定する。effectには、その対象タスクで行う操作と具体的な結果を記す。文脈の各欄を明示し、未取得の文脈は未取得と説明する。空欄検査を、内容の明確さや真偽の保証と説明しない。
+
+再説明の明確な拒否後は本人がボタンを押し直して再依頼できる。到着不明時は自動再送せず、会話側で依頼が届いたか確認する。未依頼・旧requestId・重複の説明は反映しない。

@@ -1,0 +1,1 @@
+{"name":"qa-guide-local","plugins":[{"name":"qa-guide-codex","source":{"source":"local","path":"./plugin"},"policy":{"installation":"AVAILABLE","authentication":"ON_INSTALL"},"category":"Productivity"}],"interface":{"displayName":"QA Guide Local"}}

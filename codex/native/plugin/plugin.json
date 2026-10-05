@@ -1,0 +1,29 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "qa-guide-codex",
+  "version": "0.5.2",
+  "description": "会話の質問の背景・選択後の結果・おすすめを示すローカルQA拡張。",
+  "author": {
+    "name": "sakamoto-sann"
+  },
+  "license": "MIT",
+  "extensions": {
+    "com.openai": {
+      "interface": {
+        "displayName": "QA Guide",
+        "shortDescription": "質問の背景と選択後の結果",
+        "longDescription": "同じ会話のパネルに質問を表示し、本人の明示確定で現在の会話へ回答を返すローカルMCP拡張。",
+        "developerName": "sakamoto-sann",
+        "category": "Productivity",
+        "capabilities": [
+          "Read"
+        ],
+        "defaultPrompt": [
+          "判断に必要な質問は、背景・結果・おすすめをQAパネルに示してください。"
+        ],
+        "logo": "./assets/icon.svg",
+        "composerIcon": "./assets/icon.svg"
+      }
+    }
+  }
+}

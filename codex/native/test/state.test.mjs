@@ -1,0 +1,17 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {readFileSync} from 'node:fs';
+import {validateQuestion} from '../src/question.mjs';
+import {acceptResult,answerPayload,sendAnswer,requestFull} from '../src/view-state.mjs';
+const q=validateQuestion(JSON.parse(readFileSync(new URL('./question.json',import.meta.url),'utf8')));
+const empty=()=>({question:null,revision:0,selected:null,answer:null,delivery:'idle'});
+const ready=()=>({...acceptResult(empty(),{kind:'question',question:q,revision:1}),selected:'csv'});
+test('each UI instance has isolated question state; opening empty does not reset it',()=>{const a=ready(),b=empty();assert.equal(b.question,null);assert.equal(acceptResult(a,{kind:'question',question:null,revision:0}),a);});
+test('no recommended option is preselected; same question preserves selected value',()=>{const a=acceptResult(empty(),{kind:'question',question:q,revision:1});assert.equal(a.selected,null);a.selected='csv';assert.equal(acceptResult(a,{kind:'question',question:q,revision:1}).selected,'csv');});
+test('new question clears selection; stale or conflicting revision cannot replace it',()=>{const a=ready();const b=acceptResult(a,{kind:'question',question:q,revision:2});assert.equal(b.selected,null);assert.equal(acceptResult(b,{kind:'question',question:q,revision:1}),b);assert.throws(()=>acceptResult(a,{kind:'question',question:{...q,goal:'changed'},revision:1}));});
+test('answer requires explicit valid selection and never grants approval',()=>{assert.throws(()=>answerPayload(empty()));assert.equal(answerPayload(ready()).executionApproval,false);assert.throws(()=>answerPayload({...ready(),selected:'missing'}));});
+test('unsupported host does not send or claim success',async()=>{const s=ready();await assert.rejects(sendAnswer(s,undefined));assert.equal(s.delivery,'idle');assert.equal(s.answer,null);});
+test('explicit answer sends only selection data to active thread; no transcript',async()=>{const s=ready();let sent;await sendAnswer(s,{send:async p=>{sent=p;return {};}});assert.deepEqual(sent._meta['openai/message'],{target:'active',send:true});assert.equal(s.delivery,'sent');assert.equal(s.answer.optionId,'csv');assert.ok(!sent.content[0].text.includes(q.context.recentInstructions[0]));await assert.rejects(sendAnswer(s,{send:async()=>{throw Error('duplicate');}}));});
+test('delivery errors remain uncertain and cannot be retried automatically',async()=>{const s=ready();await assert.rejects(sendAnswer(s,{send:async()=>{throw Error('unavailable');}}));assert.equal(s.delivery,'uncertain');await assert.rejects(sendAnswer(s,{send:async()=>{}}));});
+test('full context is an explicit message and preserves selection and question',async()=>{const s=ready();let sent;await requestFull(s,{send:async p=>{sent=p;return {};}});assert.equal(s.selected,'csv');assert.equal(s.revision,1);assert.equal(s.answer,null);assert.equal(sent._meta['openai/message'].target,'active');assert.equal(s.explanationPending,true);assert.ok(sent.content[0].text.includes(s.explanationRequestId));const next=acceptResult(s,{kind:'explanation',questionId:q.id,revision:1,requestId:s.explanationRequestId,text:'追加説明'});assert.equal(next.explanation,'追加説明');assert.equal(next.selected,'csv');});
+test('explanation for another question or old revision is ignored',()=>{const s=ready();assert.equal(acceptResult(s,{kind:'explanation',questionId:'wrong',revision:1,text:'bad'}),s);assert.equal(acceptResult(s,{kind:'explanation',questionId:q.id,revision:2,text:'bad'}),s);});

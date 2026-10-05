@@ -1,0 +1,8 @@
+node_modules/
+dist/
+site.tar.gz
+.env
+.env.*
+.DS_Store
+worker/index.js
+worker/source/panel-html.mjs

@@ -1,0 +1,11 @@
+import {build} from '../../native/node_modules/esbuild/lib/main.js';
+import {readFileSync,writeFileSync} from 'node:fs';
+import {resolve} from 'node:path';
+import {fileURLToPath} from 'node:url';
+const root=resolve(fileURLToPath(new URL('..',import.meta.url)));
+const dependencies=resolve(root,'../native/node_modules');
+const source=resolve(root,'worker/source');
+const ui=await build({absWorkingDir:root,entryPoints:['worker/source/app.mjs'],nodePaths:[dependencies],bundle:true,platform:'browser',format:'esm',write:false,legalComments:'inline'});
+const html=readFileSync(resolve(source,'panel.html'),'utf8').replace('__CSS__',readFileSync(resolve(source,'panel.css'),'utf8')).replace('__SCRIPT__',ui.outputFiles[0].text.replaceAll('</script','<\\/script'));
+writeFileSync(resolve(source,'panel-html.mjs'),'export default '+JSON.stringify(html)+';\n');
+await build({absWorkingDir:root,entryPoints:['worker/source/http.mjs'],nodePaths:[dependencies],bundle:true,platform:'browser',format:'esm',target:'es2022',outfile:'worker/index.js',legalComments:'inline'});
