@@ -3,7 +3,7 @@ import {registerAppResource,registerAppTool,RESOURCE_MIME_TYPE} from '@modelcont
 import {z} from 'zod';
 import {validateQuestion} from './question.mjs';
 export function createServer(html){
-  const server=new McpServer({name:'qa-guide-codex',version:'0.5.3'});
+  const server=new McpServer({name:'qa-guide-codex',version:'0.5.4'});
   const short=z.string().min(1).max(100),text=z.string().min(1).max(3000);
   const questionSchema=z.object({
     id:short,question:text,background:text,goal:text,
@@ -14,7 +14,7 @@ export function createServer(html){
     recommendation:z.object({optionId:short,reason:text}),
     constraints:z.array(text).max(10).optional(),uncertainties:z.array(text).max(10).optional()
   });
-  const resource='ui://qa-guide/question-panel/v0.5.3.html';
+  const resource='ui://qa-guide/question-panel/v0.5.4.html';
   const meta={ui:{resourceUri:resource},'openai/outputTemplate':resource,'openai/ui':{entrypoints:[{type:'thread'}]}};
   registerAppResource(server,'qa-question-panel',resource,{},async()=>({contents:[{uri:resource,mimeType:RESOURCE_MIME_TYPE,text:html,_meta:{ui:{csp:{connectDomains:[],resourceDomains:[]}},'openai/ui':{preferredDisplayMode:'inline',availableDisplayModes:['inline','fullscreen']}}}]}));
   const result=data=>({content:[{type:'text',text:JSON.stringify(data),annotations:{audience:['assistant']}}],structuredContent:data});

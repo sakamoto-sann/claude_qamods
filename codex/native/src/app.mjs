@@ -1,7 +1,7 @@
 import {App,applyDocumentTheme,applyHostStyleVariables} from '@modelcontextprotocol/ext-apps';
 import {OpenAIExtensions} from '@openai/mcp-extensions/app';
 import {acceptResult,sendAnswer,requestFull,fullStatus,answerEditable,answerStatus} from './view-state.mjs';
-const app=new App({name:'qa-guide-codex',version:'0.5.3'},{availableDisplayModes:['inline','fullscreen']},{autoResize:true});
+const app=new App({name:'qa-guide-codex',version:'0.5.4'},{availableDisplayModes:['inline','fullscreen']},{autoResize:true});
 const extensions=new OpenAIExtensions(app);
 let state={question:null,revision:0,selected:null,answer:null,delivery:'idle'},busy=false;
 const $=id=>document.getElementById(id);
@@ -30,6 +30,6 @@ function render(){
 app.ontoolresult=result=>{try{state=acceptResult(state,result.structuredContent);render();}catch(error){$('error').textContent=error.message;}};
 function style(context){if(context?.theme)applyDocumentTheme(context.theme);if(context?.styles?.variables)applyHostStyleVariables(context.styles.variables);}
 app.addEventListener('hostcontextchanged',()=>style(app.getHostContext()));
-$('answer-form').addEventListener('submit',async event=>{event.preventDefault();if(busy||!state.selected||!extensions.message||!answerEditable(state))return;busy=true;const submittedState=state;render();try{await sendAnswer(submittedState,extensions.message);$('error').textContent='';}catch(error){$('error').textContent=error.message;}finally{busy=false;render();}});
+$('submit').addEventListener('click',async event=>{event.preventDefault();if(busy||!state.selected||!extensions.message||!answerEditable(state))return;busy=true;const submittedState=state;render();try{await sendAnswer(submittedState,extensions.message);$('error').textContent='';}catch(error){$('error').textContent=error.message;}finally{busy=false;render();}});
 $('full').addEventListener('click',async()=>{if(busy||!extensions.message||!state.question||state.explanationPending)return;busy=true;const requestedState=state;render();try{await requestFull(requestedState,extensions.message);$('error').textContent='';}catch(error){$('error').textContent=error.message;}finally{busy=false;render();}});
 try{await app.connect();$('connection').textContent='ホスト接続済み';style(app.getHostContext());render();}catch(error){$('connection').textContent='接続できません';$('error').textContent=error.message;}

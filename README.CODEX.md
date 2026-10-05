@@ -9,8 +9,8 @@ The original Claude plugin and MIT license are preserved. Codex support is an in
 | Form | Location | Requirements |
 | --- | --- | --- |
 | Chat skill | [codex/skills/qa-guide](codex/skills/qa-guide) | A compatible skill host; no server |
-| Native MCP App 0.5.3 | [codex/native](codex/native/README.md) | Node.js 22+, a host supporting MCP Apps |
-| Private cloud MCP App 0.5.3 | [codex/cloud](codex/cloud/README.md) | Your own private Site and Sites-managed Install/Connect |
+| Native MCP App 0.5.4 | [codex/native](codex/native/README.md) | Node.js 22+, a host supporting MCP Apps |
+| Private cloud MCP App 0.5.4 | [codex/cloud](codex/cloud/README.md) | Your own private Site and Sites-managed Install/Connect |
 | Legacy localhost companion | [codex/panel](codex/panel) | Node.js 22+; explicit startup; no native host message bridge |
 
 ## Behavior and limits / 動作

@@ -20,5 +20,9 @@ jobs:
       - run: npm --prefix codex/native test
       - run: npm --prefix codex/cloud run build
       - run: npm --prefix codex/cloud test
+      - run: npm --prefix codex/native run test:browser
+      - run: npm --prefix codex/native run test:browser
+        env:
+          QA_BROWSER_PANEL_MODULE: ../cloud/worker/source/panel-html.mjs
       - run: node codex/panel/test.mjs
       - run: node codex/panel/http-test.mjs

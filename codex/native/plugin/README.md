@@ -1,4 +1,4 @@
-# QA Guide 0.5.3
+# QA Guide 0.5.4
 
 この配布パッケージは、固定のdist/server.mjsをNode.js 22以降で起動するstdio MCPと、会話用QAパネルです。実行時のnpm依存は不要です。導入方法とビルドは一つ上のREADME.mdを参照してください。
 
