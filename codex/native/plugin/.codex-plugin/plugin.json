@@ -1,7 +1,7 @@
 {
   "name": "qa-guide-codex",
-  "version": "0.5.4",
-  "description": "会話の質問の背景・選択後の結果・おすすめを示すローカルQA拡張。",
+  "version": "0.6.2",
+  "description": "Codex標準UIで回答し、必要なときだけ質問の背景や選択肢を補足するQAパネル。",
   "license": "MIT",
   "skills": "./skills/",
   "mcpServers": "./mcp.json"

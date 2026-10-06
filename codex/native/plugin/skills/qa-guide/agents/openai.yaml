@@ -1,4 +1,4 @@
 interface:
   display_name: "質問ガイド"
   short_description: "質問の背景、選択後の結果、目的に合うおすすめを短く説明します"
-  default_prompt: "$qa-guide のSKILL.md本文を読み込んで適用し、判断に必要な質問の背景と選択肢の結果、おすすめと理由を短く示してください。"
+  default_prompt: "$qa-guide を適用し、通常の判断はCodex標準の質問UIで行い、詳しい説明を求められたときだけQAパネルに背景や選択肢の違いを示してください。"

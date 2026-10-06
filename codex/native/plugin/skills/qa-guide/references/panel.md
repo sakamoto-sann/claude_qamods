@@ -1,15 +1,11 @@
-# MCP会話パネル版
+# Codexの補足パネル
 
-このプラグインが接続済みで、qa.open/qa.explainが利用できる場合だけ使う。未提供のAPIを呼んだと主張しない。
+回答先は標準の質問UI、またはチャットとする。本人が質問の解説を求めた場合だけ、このパネルを開く。QAツールが使えない場合はチャット内で説明し、利用できないAPIを呼んだと主張しない。
 
-1. qa.openを空引数で呼ぶと空のQAビューを表示する。本人の判断が必要な質問があるときだけ、questionと正のrevisionを明示する。questionのid/question/background/goal/taskId/taskName/currentState/decision/completionCriteria/options/recommendation、constraints/uncertainties、contextのrecentInstructions/precedingExplanation/latestWorkSummaryをこの会話の確かな情報から用意する。履歴DBや別スレッドを読み取らない。
-2. 初回はrevision 1、その会話で質問を更新するときだけ増やす。全選択肢を保持する。更新しない質問を同じrevisionで再送しても、本人の選択・回答を初期化しない。
-3. 本人がパネルで確定するとqa-answerの引用データが現在の会話へ届く。対象タスクID・質問ID・revisionが現在の質問と一致する場合だけ、選択と結果を短く確認し、許可済みの作業を続ける。古い回答・推薦・試験選択を本人の同意に変えない。executionApproval:falseを維持する。
-4. 全文脈の再説明を本人が明示した場合、依頼メッセージのrequestIdを変更せず、qa.explain({questionId,revision,requestId,text})でこの会話で参照できた範囲から再説明を返す。質問や選択を更新しない。全文脈が見えない場合は範囲を明示する。追加モデルAPIや会話全文の別サービス送信はしない。
-5. ui/messageが未対応のホストでは本人の回答はチャットで受け取る。表示要求・MCPのJSON結果・プロトコル試験だけで実画面の成功を説明しない。
+1. 選択肢のある質問は `qa.open({question,revision})` で説明する。questionにはid/question/background/goal/taskId/taskName/currentState/decision/completionCriteria/options/recommendationとcontextを明示する。必要ならtaskReference/constraints/uncertaintiesを加える。contextにはrecentInstructions/precedingExplanation/latestWorkSummaryを指定する。本人の現在の判断に関係する確かな情報だけを使い、別の会話や履歴DBを収集しない。標準UIと同じ選択肢・順序を使う。
+2. 文章の質問は `qa.chat({text,details,revision})` で説明できる。detailsは上のquestionからquestion/options/recommendationを除いた内容。検出結果に選択肢がなければ比較を作らない。no-questionは表示中の質問をリセットしない。文章の検出には見落としや誤検出があるため、呼出し側でも内容を確認する。
+3. 初回のrevisionは1。質問の変更時だけ増やす。同じrevisionで内容を変更しない。パネルの回答欄は用意せず、標準UIで質問中なら回答はそちらで受け取る。チャットの解説依頼や閉じる操作を、回答・取消・実行承認として扱わない。
+4. 本人が「AI要約」または「全文脈で解説」を押すと、解説依頼が現在の会話へ届く。qa.explain({questionId,revision,requestId,text})で返し、requestIdを変えない。質問を再送して状態をリセットしない。mode:compactは依頼のbackground/goal/context/optionsやタスク情報から短く説明する。mode:fullは会話で参照できる文脈から説明し、未取得の範囲は明示する。追加モデルAPIや料金の推計を行わない。
+5. 表示はinlineを既定とし、ホストが対応する場合だけ「広げる」「小さく表示」を本人が操作する。自動で全画面にしない。ホストのui/messageが未対応なら追加の解説依頼はチャットで受け取る。JSON結果・起動試験・DOMの模擬試験と、Codex上の実表示・送信確認を区別する。
 
-状態は各会話のUI instanceのメモリだけに保持し、サーバーは全会話共有の質問・回答状態を持たない。このMCP版の表示と送信はホスト対応に依存する。モデル側は前提を満たす質問だけを送り、ラベルだけから仕様を作らない。
-
-対象タスクの表示名とID、現在状態、決める事項、完了条件は省略しない。taskReferenceは必要な場合だけ指定する。effectには、その対象タスクで行う操作と具体的な結果を記す。文脈の各欄を明示し、未取得の文脈は未取得と説明する。空欄検査を、内容の明確さや真偽の保証と説明しない。
-
-再説明の明確な拒否後は本人がボタンを押し直して再依頼できる。到着不明時は自動再送せず、会話側で依頼が届いたか確認する。未依頼・旧requestId・重複の説明は反映しない。
+状態はUI instanceのメモリに保持し、サーバーは会話共有の質問・回答状態を持たない。解説の明確な送信拒否後は本人が再依頼できる。到着が不明な場合は自動再送しない。未依頼・旧requestId・重複・閉じた質問の説明は反映しない。

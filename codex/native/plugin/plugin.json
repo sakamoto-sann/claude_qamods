@@ -1,8 +1,8 @@
 {
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "qa-guide-codex",
-  "version": "0.5.4",
-  "description": "会話の質問の背景・選択後の結果・おすすめを示すローカルQA拡張。",
+  "version": "0.6.2",
+  "description": "Codex標準UIで回答し、必要なときだけ質問の背景や選択肢を補足するQAパネル。",
   "author": {
     "name": "sakamoto-sann"
   },
@@ -11,15 +11,15 @@
     "com.openai": {
       "interface": {
         "displayName": "QA Guide",
-        "shortDescription": "質問の背景と選択後の結果",
-        "longDescription": "同じ会話のパネルに質問を表示し、本人の明示確定で現在の会話へ回答を返すローカルMCP拡張。",
+        "shortDescription": "必要なときだけ質問を補足",
+        "longDescription": "通常の回答はCodex標準の質問UIまたはチャットで受け取り、QAは会話内の補足パネルとして表示します。",
         "developerName": "sakamoto-sann",
         "category": "Productivity",
         "capabilities": [
           "Read"
         ],
         "defaultPrompt": [
-          "判断に必要な質問は、背景・結果・おすすめをQAパネルに示してください。"
+          "通常の判断はCodex標準の質問UIで行い、詳しい説明を求めたときだけQAパネルに背景や選択肢の違いを示してください。"
         ],
         "logo": "./assets/icon.svg",
         "composerIcon": "./assets/icon.svg"

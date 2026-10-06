@@ -4,7 +4,7 @@ import panelHtml from './panel-html.mjs';
 
 const MAX_BODY=65536;
 const discovery=new Set(['initialize','notifications/initialized','ping','tools/list','resources/list','resources/templates/list','resources/read']);
-const page='<!doctype html><html lang="ja"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>QA Guide</title><style>body{max-width:720px;margin:64px auto;padding:24px;font:16px/1.8 system-ui;color:#17251e;background:#f5f7f3}h1{font-size:32px}section{background:white;padding:24px;border-radius:18px}</style><h1>QA Guide</h1><section><p>質問の背景、対象タスク、現在状態、完了条件と、選択した結果を会話のパネルで確認できます。</p><p>本人専用のプラグインです。ChatGPTのPlugins → Personal → Created by youからQA Guideを開き、InstallまたはConnectしてください。</p><p>扱うのは明示的に渡した質問・説明と選択回答だけです。ファイルや会話履歴を自動で読みません。回答は実行承認の代用になりません。</p></section></html>';
+const page='<!doctype html><html lang="ja"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>QA Guide</title><style>body{max-width:720px;margin:64px auto;padding:24px;font:16px/1.8 system-ui;color:#17251e;background:#f5f7f3}h1{font-size:32px}section{background:white;padding:24px;border-radius:18px}</style><h1>QA Guide</h1><section><p>質問の背景、対象タスク、現在状態、完了条件と、選択肢の違いを会話のパネルで確認できます。</p><p>本人専用のプラグインです。ChatGPTのPlugins → Personal → Created by youからQA Guideを開き、InstallまたはConnectしてください。</p><p>扱うのは明示的に渡した質問と説明だけです。ファイルや会話履歴を自動で読みません。回答は標準の質問UIまたはチャットで受け取ります。</p></section></html>';
 
 async function parseBody(request){
   if(!request.body)return null;
