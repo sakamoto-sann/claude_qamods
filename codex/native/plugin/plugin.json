@@ -1,0 +1,29 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "qa-guide-codex",
+  "version": "0.6.2",
+  "description": "Codex標準UIで回答し、必要なときだけ質問の背景や選択肢を補足するQAパネル。",
+  "author": {
+    "name": "sakamoto-sann"
+  },
+  "license": "MIT",
+  "extensions": {
+    "com.openai": {
+      "interface": {
+        "displayName": "QA Guide",
+        "shortDescription": "必要なときだけ質問を補足",
+        "longDescription": "通常の回答はCodex標準の質問UIまたはチャットで受け取り、QAは会話内の補足パネルとして表示します。",
+        "developerName": "sakamoto-sann",
+        "category": "Productivity",
+        "capabilities": [
+          "Read"
+        ],
+        "defaultPrompt": [
+          "通常の判断はCodex標準の質問UIで行い、詳しい説明を求めたときだけQAパネルに背景や選択肢の違いを示してください。"
+        ],
+        "logo": "./assets/icon.svg",
+        "composerIcon": "./assets/icon.svg"
+      }
+    }
+  }
+}

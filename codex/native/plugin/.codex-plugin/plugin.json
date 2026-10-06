@@ -1,0 +1,8 @@
+{
+  "name": "qa-guide-codex",
+  "version": "0.6.2",
+  "description": "Codex標準UIで回答し、必要なときだけ質問の背景や選択肢を補足するQAパネル。",
+  "license": "MIT",
+  "skills": "./skills/",
+  "mcpServers": "./mcp.json"
+}

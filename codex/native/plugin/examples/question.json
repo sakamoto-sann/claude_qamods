@@ -1,0 +1,44 @@
+{
+  "id": "training-format",
+  "question": "研修用の説明を、どの形式で出力しますか？",
+  "goal": "担当者が長い説明を読みやすくする",
+  "background": "今回は表計算への取込みを行わず、担当者の閲覧用に出力形式を決めます。",
+  "constraints": [
+    "実データを含まない架空の研修用資料"
+  ],
+  "options": [
+    {
+      "id": "markdown",
+      "label": "Markdown",
+      "effect": "研修用説明資料をMarkdownで出力し、見出しと本文を整えた文書にします。",
+      "benefit": "長い文章を読みやすくできます。",
+      "cost": "将来表計算へ取り込む際は整形が必要です。"
+    },
+    {
+      "id": "csv",
+      "label": "CSV",
+      "effect": "研修用説明資料をCSVで出力し、項目を行と列に分けたデータにします。",
+      "benefit": "表計算へ取り込みやすくなります。",
+      "cost": "長い説明文を読むには向きません。"
+    }
+  ],
+  "recommendation": {
+    "optionId": "markdown",
+    "reason": "今回は取込みをせず、担当者が文章を読むことを優先するためです。"
+  },
+  "uncertainties": [],
+  "context": {
+    "recentInstructions": [
+      "架空の研修用資料の出力を決めたい",
+      "取込みはせず、担当者が読むことを優先したい"
+    ],
+    "precedingExplanation": "読みやすい文章か、表計算に取り込める形式かを比較しています。",
+    "latestWorkSummary": "候補はMarkdownとCSVです。今回の目的は閲覧のしやすさです。"
+  },
+  "taskId": "training-document",
+  "taskName": "研修用説明資料の出力",
+  "currentState": "架空の研修用資料を作成中。出力形式は未決定。",
+  "decision": "研修担当者の閲覧用資料をMarkdownかCSVのどちらで出力するか。",
+  "completionCriteria": "選んだ形式で架空の研修用説明を出力し、担当者が読める状態にする。",
+  "taskReference": "架空の研修資料タスク"
+}
