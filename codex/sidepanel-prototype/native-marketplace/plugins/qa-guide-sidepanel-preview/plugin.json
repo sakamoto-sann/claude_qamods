@@ -1,0 +1,27 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "qa-guide-sidepanel-preview",
+  "version": "0.1.0",
+  "description": "現行QA Guideを保持して、専用サイドパネル起動を試す独立プラグイン。",
+  "author": {
+    "name": "sakamoto-sann"
+  },
+  "license": "MIT",
+  "extensions": {
+    "com.openai": {
+      "interface": {
+        "displayName": "QA Guide Sidepanel Preview",
+        "shortDescription": "サイドパネルの独立試作",
+        "longDescription": "質問の解説（試作）をサイドパネルから開きます。初回はサンプルです。現行版の質問・回答フローは変更しません。",
+        "developerName": "sakamoto-sann",
+        "category": "Productivity",
+        "capabilities": [
+          "Read"
+        ],
+        "defaultPrompt": "この試作のqapreview.panelでサイドパネル表示を確認してください。",
+        "logo": "./assets/icon.svg",
+        "composerIcon": "./assets/icon.svg"
+      }
+    }
+  }
+}
