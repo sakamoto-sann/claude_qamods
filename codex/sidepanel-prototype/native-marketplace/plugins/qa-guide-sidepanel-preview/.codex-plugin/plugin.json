@@ -1,0 +1,7 @@
+{
+  "name": "qa-guide-sidepanel-preview",
+  "version": "0.1.0",
+  "description": "現行QA Guideを保持して、専用サイドパネル起動を試す独立プラグイン。",
+  "license": "MIT",
+  "mcpServers": "./mcp.json"
+}

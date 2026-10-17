@@ -1,0 +1,6 @@
+*.log
+*.pid
+verification*.json
+__pycache__/
+/panel.html
+/native-marketplace/plugins/qa-guide-sidepanel-preview/dist/

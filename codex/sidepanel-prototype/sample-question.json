@@ -1,0 +1,46 @@
+{
+  "id": "sidepanel-demo",
+  "question": "解説を横で見ながら、今までどおり回答できます",
+  "goal": "背景や選択肢を会話の横で確認する",
+  "background": "表示確認用のサンプルです。実際の判断や承認は求めていません。",
+  "constraints": [
+    "サンプル表示のみ"
+  ],
+  "options": [
+    {
+      "id": "on-demand",
+      "label": "必要なときに開く",
+      "effect": "「??」「詳しく」と頼んだときに解説を表示する案です。",
+      "benefit": "普段の会話を保てます。",
+      "cost": "開く操作が必要です。"
+    },
+    {
+      "id": "pinned",
+      "label": "並べて見る",
+      "effect": "解説を開いたまま会話と比較する案です。",
+      "benefit": "選択肢を見返せます。",
+      "cost": "会話に使える横幅が狭くなります。"
+    }
+  ],
+  "recommendation": {
+    "optionId": "on-demand",
+    "reason": "今の使い方に満足しているため、必要なときだけ追加する形を試します。"
+  },
+  "uncertainties": [
+    "ネイティブMCPタブの実表示は未検証です。"
+  ],
+  "context": {
+    "mode": "compact",
+    "recentInstructions": [
+      "現行版を変えず試作する"
+    ],
+    "precedingExplanation": "別名のプラグインで表示を試します。",
+    "latestWorkSummary": "明示的な情報だけを表示します。"
+  },
+  "taskId": "qa-sidepanel-preview",
+  "taskName": "QA Guide サイドパネルの試作",
+  "currentState": "現行版を変更しない独立した試作です。",
+  "decision": "解説を横で読めるか確かめる。",
+  "completionCriteria": "狭い幅でも読めて、閉じる・再表示ができる。",
+  "taskReference": "ローカル表示試作"
+}

@@ -1,0 +1,40 @@
+import assert from 'node:assert/strict';
+import {readFileSync,existsSync} from 'node:fs';
+import path from 'node:path';
+import {fileURLToPath, pathToFileURL} from 'node:url';
+const root=path.dirname(fileURLToPath(import.meta.url));
+const modules=path.resolve(root,'../native/node_modules/@modelcontextprotocol/sdk/dist/esm/client');
+const {Client}=await import(pathToFileURL(path.join(modules,'index.js')));
+const {StdioClientTransport}=await import(pathToFileURL(path.join(modules,'stdio.js')));
+const notices=readFileSync(path.join(root,'THIRD_PARTY_NOTICES.md'),'utf8');
+for(const relative of ['node_modules/zod/package.json','node_modules/@openai/mcp-extensions/node_modules/zod/package.json']){
+ const manifestPath=path.resolve(root,'../native',relative);
+ if(existsSync(manifestPath)){
+  const manifest=JSON.parse(readFileSync(manifestPath,'utf8'));
+  assert.ok(notices.includes('## zod '+manifest.version+'\n'),'Missing bundled Zod notice: '+manifest.version);
+ }
+}
+const client=new Client({name:'qa-preview-check',version:'0.1.0'});
+const transport=new StdioClientTransport({command:process.execPath,args:[path.join(root,'native-marketplace/plugins/qa-guide-sidepanel-preview/dist/server.mjs')]});
+const deadline=setTimeout(()=>{console.error('Protocol check timed out');process.exitCode=1;void client.close()},20000);
+try{
+ await client.connect(transport);
+ const {tools}=await client.listTools();
+ assert.deepEqual(tools.map(t=>t.name).sort(),['qapreview.open','qapreview.chat','qapreview.explain','qapreview.panel'].sort());
+ const entries=tools.filter(t=>t._meta?.['openai/ui']?.entrypoints);
+ assert.equal(entries.length,1);assert.equal(entries[0].name,'qapreview.panel');
+ const sample=await client.callTool({name:'qapreview.panel',arguments:{}});
+ assert.ok(!sample.isError);assert.equal(sample.structuredContent.question.id,'sidepanel-demo');
+ assert.equal(entries[0]._meta.ui.resourceUri,'ui://qa-guide-sidepanel-preview/question-panel/v0.1.0.html');
+ const result=await client.readResource({uri:entries[0]._meta.ui.resourceUri});
+ assert.ok(result.contents[0].text.includes('qapreview.explain'));
+ assert.ok(!result.contents[0].text.includes('qa.explain'));
+ const q={...sample.structuredContent.question,id:'explicit-question',question:'明示的な質問は表示できますか？'};
+ const updated=await client.callTool({name:'qapreview.open',arguments:{question:q,revision:2}});
+ assert.equal(updated.structuredContent.question.id,q.id);
+ const explained=await client.callTool({name:'qapreview.explain',arguments:{questionId:q.id,revision:2,requestId:'test-request',text:'試験用の説明です。'}});
+ assert.equal(explained.structuredContent.requestId,'test-request');
+ const bad=await client.callTool({name:'qapreview.open',arguments:{question:q,revision:0}});
+ assert.equal(bad.isError,true);
+ console.log('PASS: isolated names, one thread entrypoint, sample, resource, explicit update, explanation identity, invalid revision');
+}finally{clearTimeout(deadline);await client.close()}

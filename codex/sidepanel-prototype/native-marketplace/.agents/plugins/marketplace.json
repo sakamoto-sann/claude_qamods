@@ -1,0 +1,20 @@
+{
+  "name": "qa-sidepanel-preview-local",
+  "interface": {
+    "displayName": "QA Sidepanel Preview Local"
+  },
+  "plugins": [
+    {
+      "name": "qa-guide-sidepanel-preview",
+      "source": {
+        "source": "local",
+        "path": "./plugins/qa-guide-sidepanel-preview"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    }
+  ]
+}
