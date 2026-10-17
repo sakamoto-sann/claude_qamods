@@ -10,7 +10,7 @@ const {build}=require('esbuild');
 const plugin=path.join(root,'native-marketplace/plugins/qa-guide-sidepanel-preview');
 const fixture=JSON.parse(readFileSync(path.join(root,'sample-question.json'),'utf8'));
 const transform={name:'isolated-preview',setup(builder){
- builder.onLoad({filter:/\/src\/.*\.mjs$/},async args=>{
+ builder.onLoad({filter:/[\\/]src[\\/].*\.mjs$/},async args=>{
   if(!args.path.startsWith(base+path.sep))return;
   let contents=readFileSync(args.path,'utf8');
   contents=contents.replaceAll('qa-guide-codex','qa-guide-sidepanel-preview')

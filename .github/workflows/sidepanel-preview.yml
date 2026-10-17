@@ -1,10 +1,10 @@
 name: sidepanel-preview
 on:
   pull_request:
-    paths: ['codex/sidepanel-prototype/**', '.github/workflows/sidepanel-preview.yml']
+    paths: ['codex/native/**', 'codex/sidepanel-prototype/**', '.github/workflows/sidepanel-preview.yml']
   push:
     branches: [main]
-    paths: ['codex/sidepanel-prototype/**', '.github/workflows/sidepanel-preview.yml']
+    paths: ['codex/native/**', 'codex/sidepanel-prototype/**', '.github/workflows/sidepanel-preview.yml']
 permissions:
   contents: read
 jobs:
