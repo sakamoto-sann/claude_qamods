@@ -11,11 +11,12 @@ const deadline=setTimeout(()=>{console.error('Protocol check timed out');process
 try{
  await client.connect(transport);
  const {tools}=await client.listTools();
- assert.deepEqual(tools.map(t=>t.name),['qapreview.open','qapreview.chat','qapreview.explain','qapreview.panel']);
+ assert.deepEqual(tools.map(t=>t.name).sort(),['qapreview.open','qapreview.chat','qapreview.explain','qapreview.panel'].sort());
  const entries=tools.filter(t=>t._meta?.['openai/ui']?.entrypoints);
  assert.equal(entries.length,1);assert.equal(entries[0].name,'qapreview.panel');
  const sample=await client.callTool({name:'qapreview.panel',arguments:{}});
  assert.ok(!sample.isError);assert.equal(sample.structuredContent.question.id,'sidepanel-demo');
+ assert.equal(entries[0]._meta.ui.resourceUri,'ui://qa-guide-sidepanel-preview/question-panel/v0.1.0.html');
  const result=await client.readResource({uri:entries[0]._meta.ui.resourceUri});
  assert.ok(result.contents[0].text.includes('qapreview.explain'));
  assert.ok(!result.contents[0].text.includes('qa.explain'));

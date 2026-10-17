@@ -33,8 +33,12 @@ codex plugin add qa-guide-sidepanel-preview@qa-sidepanel-preview-local
 
 ```sh
 node codex/sidepanel-prototype/check-native.mjs
+node codex/sidepanel-prototype/check-retry.mjs
+python3 codex/sidepanel-prototype/check-preview.py
 ```
 
 初期化、ツール名の分離、唯一のthread入口、サンプル、HTML取得、質問更新、再説明ID、不正revision拒否を検証します。ビルド元は同じリポジトリのcodex/nativeです。原本は読み取りだけで、生成先は試作フォルダ内です。SDKを含む生成物はGitに含めません。MITのLICENSEとTHIRD_PARTY_NOTICESを保持します。
 
 ブラウザー表示とstdio検証は、ネイティブMCPタブでの表示成功とは別です。CodexのMCP専用タブの実表示は未検証です。独立レビューツールが利用できず、別工程の読み取り専用セルフレビューを実施しました。
+
+ライセンス表記はesbuildの入力一覧から生成し、SDKの直接依存@cfworker/json-schemaも補足します。このパッケージのnpm配布物にライセンス本文がないため、公式リポジトリの[LICENSE.md](https://github.com/cfworker/cfworker/blob/main/LICENSE.md)をlicenses/に保持しています。

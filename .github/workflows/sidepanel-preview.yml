@@ -15,7 +15,11 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
+          cache: npm
+          cache-dependency-path: codex/native/package-lock.json
       - run: npm --prefix codex/native ci --ignore-scripts
       - run: node codex/sidepanel-prototype/build-native.mjs
       - run: node codex/sidepanel-prototype/check-native.mjs
+      - run: node codex/sidepanel-prototype/check-retry.mjs
       - run: python3 -m compileall -q codex/sidepanel-prototype
+      - run: python3 codex/sidepanel-prototype/check-preview.py

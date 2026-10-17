@@ -18,7 +18,9 @@
         "capabilities": [
           "Read"
         ],
-        "defaultPrompt": "この試作のqapreview.panelでサイドパネル表示を確認してください。",
+        "defaultPrompt": [
+          "この試作のqapreview.panelでサイドパネル表示を確認してください。"
+        ],
         "logo": "./assets/icon.svg",
         "composerIcon": "./assets/icon.svg"
       }

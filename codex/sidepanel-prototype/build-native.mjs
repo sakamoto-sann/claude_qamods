@@ -1,4 +1,4 @@
-import {readFileSync, writeFileSync, mkdirSync} from 'node:fs';
+import {readFileSync, writeFileSync, mkdirSync, existsSync} from 'node:fs';
 import {fileURLToPath} from 'node:url';
 import path from 'node:path';
 import {createRequire} from 'node:module';
@@ -32,11 +32,43 @@ const transform={name:'isolated-preview',setup(builder){
   return {contents,loader:'js',resolveDir:path.dirname(args.path)};
  });
 }};
-const ui=await build({entryPoints:[path.join(base,'src/app.mjs')],bundle:true,platform:'browser',format:'esm',write:false,plugins:[transform],legalComments:'inline'});
+const ui=await build({entryPoints:[path.join(base,'src/app.mjs')],bundle:true,platform:'browser',format:'esm',write:false,plugins:[transform],metafile:true,legalComments:'inline'});
 const template=readFileSync(path.join(base,'src/panel.html'),'utf8').replace('<h1>質問の補足</h1>','<h1>質問の補足 · 試作</h1>');
 const html=renderPanel(template,readFileSync(path.join(base,'src/panel.css'),'utf8'),ui.outputFiles[0].text);
 mkdirSync(path.join(plugin,'dist'),{recursive:true});
 writeFileSync(path.join(plugin,'dist/panel.html'),html);
 writeFileSync(path.join(root,'panel.html'),html);
-await build({entryPoints:[path.join(base,'src/main.mjs')],bundle:true,platform:'node',format:'esm',outfile:path.join(plugin,'dist/server.mjs'),plugins:[transform],banner:{js:"import {createRequire as __createRequire} from 'node:module'; const require=__createRequire(import.meta.url);"},legalComments:'inline'});
+const server=await build({entryPoints:[path.join(base,'src/main.mjs')],bundle:true,platform:'node',format:'esm',outfile:path.join(plugin,'dist/server.mjs'),plugins:[transform],metafile:true,banner:{js:"import {createRequire as __createRequire} from 'node:module'; const require=__createRequire(import.meta.url);"},legalComments:'inline'});
 console.log('Built isolated preview. Existing plugin files were not modified.');
+
+// Derive license notices from the dependencies actually included by esbuild.
+const packages=new Map();
+for(const input of [...Object.keys(ui.metafile.inputs),...Object.keys(server.metafile.inputs)]){
+ let directory=path.dirname(path.resolve(input));
+ if(!directory.includes('node_modules'))continue;
+ while(directory!==path.dirname(directory)){
+  const manifestPath=path.join(directory,'package.json');
+  if(existsSync(manifestPath)){
+   const manifest=JSON.parse(readFileSync(manifestPath,'utf8'));
+   if(manifest.name){packages.set(manifest.name,{directory,manifest});break;}
+  }
+  directory=path.dirname(directory);
+ }
+}
+// Include the schema validator shipped as a direct SDK dependency as well.
+const validator=path.join(base,'node_modules/@cfworker/json-schema');
+if(existsSync(path.join(validator,'package.json'))){
+ const manifest=JSON.parse(readFileSync(path.join(validator,'package.json'),'utf8'));
+ packages.set(manifest.name,{directory:validator,manifest});
+}
+let notices='# Third-party runtime notices\n\nGenerated from the dependencies bundled by build-native.mjs.\n';
+for(const [name,{directory,manifest}] of [...packages].sort(([a],[b])=>a.localeCompare(b))){
+ const candidates=['LICENSE','LICENSE.md','LICENSE.txt','LICENSE-MIT','license','license.md','License'];
+ const license=candidates.map(n=>path.join(directory,n)).find(existsSync)
+  || (name==='@cfworker/json-schema' ? path.join(root,'licenses/cfworker-LICENSE.md') : undefined);
+ if(!license)throw new Error('Missing license text for bundled dependency: '+name);
+ notices+='\n## '+name+' '+manifest.version+'\n\n'+readFileSync(license,'utf8').trim()+'\n';
+ for(const extra of ['NOTICE','NOTICE.txt'])if(existsSync(path.join(directory,extra)))notices+='\n'+readFileSync(path.join(directory,extra),'utf8').trim()+'\n';
+}
+writeFileSync(path.join(root,'THIRD_PARTY_NOTICES.md'),notices);
+writeFileSync(path.join(plugin,'THIRD_PARTY_NOTICES.md'),notices);
