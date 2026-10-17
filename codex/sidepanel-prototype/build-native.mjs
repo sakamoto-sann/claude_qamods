@@ -50,7 +50,7 @@ for(const input of [...Object.keys(ui.metafile.inputs),...Object.keys(server.met
   const manifestPath=path.join(directory,'package.json');
   if(existsSync(manifestPath)){
    const manifest=JSON.parse(readFileSync(manifestPath,'utf8'));
-   if(manifest.name){packages.set(manifest.name,{directory,manifest});break;}
+   if(manifest.name){packages.set(directory,{directory,manifest});break;}
   }
   directory=path.dirname(directory);
  }
@@ -59,10 +59,11 @@ for(const input of [...Object.keys(ui.metafile.inputs),...Object.keys(server.met
 const validator=path.join(base,'node_modules/@cfworker/json-schema');
 if(existsSync(path.join(validator,'package.json'))){
  const manifest=JSON.parse(readFileSync(path.join(validator,'package.json'),'utf8'));
- packages.set(manifest.name,{directory:validator,manifest});
+ packages.set(validator,{directory:validator,manifest});
 }
 let notices='# Third-party runtime notices\n\nGenerated from the dependencies bundled by build-native.mjs.\n';
-for(const [name,{directory,manifest}] of [...packages].sort(([a],[b])=>a.localeCompare(b))){
+for(const {directory,manifest} of [...packages.values()].sort((a,b)=>a.manifest.name.localeCompare(b.manifest.name)||a.manifest.version.localeCompare(b.manifest.version))){
+ const name=manifest.name;
  const candidates=['LICENSE','LICENSE.md','LICENSE.txt','LICENSE-MIT','license','license.md','License'];
  const license=candidates.map(n=>path.join(directory,n)).find(existsSync)
   || (name==='@cfworker/json-schema' ? path.join(root,'licenses/cfworker-LICENSE.md') : undefined);

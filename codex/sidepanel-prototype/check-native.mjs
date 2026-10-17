@@ -1,10 +1,19 @@
 import assert from 'node:assert/strict';
+import {readFileSync,existsSync} from 'node:fs';
 import path from 'node:path';
 import {fileURLToPath, pathToFileURL} from 'node:url';
 const root=path.dirname(fileURLToPath(import.meta.url));
 const modules=path.resolve(root,'../native/node_modules/@modelcontextprotocol/sdk/dist/esm/client');
 const {Client}=await import(pathToFileURL(path.join(modules,'index.js')));
 const {StdioClientTransport}=await import(pathToFileURL(path.join(modules,'stdio.js')));
+const notices=readFileSync(path.join(root,'THIRD_PARTY_NOTICES.md'),'utf8');
+for(const relative of ['node_modules/zod/package.json','node_modules/@openai/mcp-extensions/node_modules/zod/package.json']){
+ const manifestPath=path.resolve(root,'../native',relative);
+ if(existsSync(manifestPath)){
+  const manifest=JSON.parse(readFileSync(manifestPath,'utf8'));
+  assert.ok(notices.includes('## zod '+manifest.version+'\n'),'Missing bundled Zod notice: '+manifest.version);
+ }
+}
 const client=new Client({name:'qa-preview-check',version:'0.1.0'});
 const transport=new StdioClientTransport({command:process.execPath,args:[path.join(root,'native-marketplace/plugins/qa-guide-sidepanel-preview/dist/server.mjs')]});
 const deadline=setTimeout(()=>{console.error('Protocol check timed out');process.exitCode=1;void client.close()},20000);
